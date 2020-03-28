@@ -15,9 +15,10 @@ Change the game to follow these rules:
 3. Add another dice to the game, so that there are two dices now. The player looses his current score when one of them is a 1. (Hint: you will need CSS to position the second dice, so take a look at the CSS code for the first one.)
 */
 
-var scores, roundScore, activePlayer, dice, dice2, gamePlaying, maximumScore;
+var scores, roundScore, activePlayer, dice, dice2, gamePlaying, previousDice, previousDice2;
 
 init();
+
 
 document.querySelector('.btn-roll').addEventListener('click', () => {
 
@@ -27,13 +28,11 @@ document.querySelector('.btn-roll').addEventListener('click', () => {
         var diceDOM = document.querySelector('.dice');
         diceDOM.style.display = 'block';
         diceDOM.src = 'dice-'+ dice + '.png';
-        var previousDice = dice;
-
+        
         var dice2 =  Math.floor(Math.random() * 6) +1;
         var dice2DOM = document.querySelector('.dice2');
         dice2DOM.style.display = 'block';
         dice2DOM.src = 'dice-'+ dice2 + '.png';
-        var previousDice2 = dice2;
 
 
         if (dice !== 1 && dice2 !== 1) {
@@ -41,25 +40,37 @@ document.querySelector('.btn-roll').addEventListener('click', () => {
             document.querySelector('#current-' + activePlayer).textContent = roundScore;
         }else if(previousDice === 6 && dice === 6 || previousDice2 === 6 && dice2 === 6){
             scores[activePlayer] = 0;
+            document.querySelector('#score-' + activePlayer).textContent = 0;
             nextPlayer();
     
         }else {
             nextPlayer();
         }
+
+        previousDice = dice;
+        previousDice2 = dice2
     }
 });
 
 document.querySelector('.btn-hold').addEventListener('click', () => {
 
-    maximumScore = document.getElementById('maximumScore').value;
-
     if(gamePlaying){
         scores[activePlayer] += roundScore;
      document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
 
-     if(scores[activePlayer] >= maximumScore){
+     var maximumScore = document.getElementById('maximumScore').value;
+    var winningScore;
+
+    if(maximumScore){
+        winningScore = maximumScore;
+    }else{
+        winningScore = 100;
+    }
+
+     if(scores[activePlayer] >= winningScore){
          document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
          document.querySelector('.dice').style.display = 'none';
+         document.querySelector('.dice2').style.display = 'none';
          document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
          document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
          gamePlaying = false;
@@ -105,4 +116,8 @@ function init() {
     document.querySelector('.player-1-panel').classList.remove('winner');
     document.querySelector('.player-1-panel').classList.remove('active');
     document.querySelector('.player-0-panel').classList.add('active');
+}
+
+function randomNumber(){
+    return Math.floor(Math.random() * 6) +1;
 }
